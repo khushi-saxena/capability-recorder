@@ -1,0 +1,54 @@
+{% extends "content_base.html" %}
+{% block title %}Open Sub-Account{% endblock %}
+{% block heading %}Open Sub-Account{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#ffffff" bordercolor="#808080">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="10">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Member {{ member_id }} &mdash; {{ member.name }}</font></td>
+        </tr>
+        {% if error %}
+        <tr>
+          <td>
+            <table width="100%" border="1" cellspacing="0" cellpadding="6" bgcolor="#ffff99" bordercolor="#cc0000">
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2" color="#cc0000"><b>{{ error }}</b></font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td>
+            <form method="post" action="{{ url_for('subaccount_new', member_id=member_id) }}" autocomplete="off">
+              <table border="0" cellspacing="4" cellpadding="2">
+                <tr>
+                  <td align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Product</font></td>
+                  <td>
+                    <select name="fld_001">
+                      <option value=""></option>
+                      <option value="SAVINGS">SAVINGS</option>
+                      <option value="CHECKING">CHECKING</option>
+                      <option value="MONEY MARKET">MONEY MARKET</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Opening Amount</font></td>
+                  <td><input type="text" name="fld_002" size="14"></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><input type="submit" value="Continue"></td>
+                </tr>
+              </table>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

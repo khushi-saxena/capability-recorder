@@ -158,22 +158,23 @@ def content_conditions(view):
 
     @wraps(view)
     def wrapped(*args, **kwargs):
-        inject = _inject_state()
-        slow = request.args.get("slow") == "1" or bool(inject.get("slow"))
-        loaded = request.args.get("_loaded") == "1"
-        if slow and not loaded:
-            next_url = _with_query(_content_url(), _loaded="1")
-            return render_template("loading.html", next_url=next_url)
+        if request.method == "GET":
+            inject = _inject_state()
+            slow = request.args.get("slow") == "1" or bool(inject.get("slow"))
+            loaded = request.args.get("_loaded") == "1"
+            if slow and not loaded:
+                next_url = _with_query(_content_url(), _loaded="1")
+                return render_template("loading.html", next_url=next_url)
 
-        interstitial = request.args.get("interstitial") or inject.get("interstitial")
-        if interstitial in ("1", "unknown"):
-            acked = session.get("acked_interstitials") or []
-            if interstitial not in acked:
-                return render_template(
-                    "interstitial.html",
-                    variant=interstitial,
-                    next_url=_content_url(),
-                )
+            interstitial = request.args.get("interstitial") or inject.get("interstitial")
+            if interstitial in ("1", "unknown"):
+                acked = session.get("acked_interstitials") or []
+                if interstitial not in acked:
+                    return render_template(
+                        "interstitial.html",
+                        variant=interstitial,
+                        next_url=_content_url(),
+                    )
         return view(*args, **kwargs)
 
     return wrapped
@@ -189,6 +190,8 @@ def login():
     error = None
     if request.args.get("expired") == "1":
         error = "Your session has expired"
+    if request.method == "GET" and request.args.get("expired") != "1":
+        session.pop("operator", None)
     if request.method == "POST":
         operator = (request.form.get("fld_001") or "").strip() or "TELLER"
         session.clear()
@@ -361,8 +364,6 @@ def admin_inject():
     inject = _inject_state()
     if request.method == "POST":
         mode = request.form.get("fld_001") or "off"
-        inject["slow"] = mode == "slow" or request.form.get("fld_002") == "slow"
-        # fld_001 is the primary toggle: off | slow | interstitial | unknown | expire | clear
         mapping = {
             "off": {"slow": False, "interstitial": None, "expire": False},
             "slow": {"slow": True, "interstitial": None, "expire": False},
@@ -403,4 +404,4 @@ def admin_inject():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8800, debug=True)
+    app.run(host="127.0.0.1", port=8800)

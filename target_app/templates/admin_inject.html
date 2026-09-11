@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>PHCU Demo Inject</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#d4d0c8" text="#000000" topmargin="0" leftmargin="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="8" bgcolor="#660000">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="3" color="#ffffff"><b>Demo Condition Inject</b></font></td>
+        </tr>
+      </table>
+      <table width="640" border="0" cellspacing="8" cellpadding="0">
+        <tr>
+          <td>
+            <font face="Tahoma, Arial, Helvetica, sans-serif" size="2">
+              Toggle a runtime condition for the next content-frame request.
+              SESSION_TTL is {{ ttl }} seconds. Query flags <b>?slow=1</b>,
+              <b>?interstitial=1</b>, and <b>?interstitial=unknown</b> still work without this page.
+            </font>
+            {% if saved %}
+            <table width="100%" border="1" cellspacing="0" cellpadding="6" bgcolor="#ccffcc" bordercolor="#006600">
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><b>Inject applied.</b> slow={{ inject.slow }} interstitial={{ inject.interstitial }} expire={{ inject.expire }}</font></td>
+              </tr>
+            </table>
+            {% endif %}
+            <form method="post" action="{{ url_for('admin_inject') }}">
+              <table border="1" cellspacing="0" cellpadding="6" bgcolor="#ffffff" bordercolor="#808080">
+                <tr>
+                  <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Condition</font></td>
+                  <td>
+                    <select name="fld_001">
+                      <option value="off"{% if not inject.slow and not inject.interstitial and not inject.expire %} selected{% endif %}>Off (normal)</option>
+                      <option value="slow"{% if inject.slow %} selected{% endif %}>Slow load (3s &quot;Loading, please wait&quot;)</option>
+                      <option value="interstitial"{% if inject.interstitial == "1" %} selected{% endif %}>Interstitial Acknowledge</option>
+                      <option value="unknown"{% if inject.interstitial == "unknown" %} selected{% endif %}>Interstitial unknown (Continue)</option>
+                      <option value="expire"{% if inject.expire %} selected{% endif %}>Expire session cookie</option>
+                      <option value="clear">Clear inject + reset members</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><input type="submit" value="Apply"></td>
+                </tr>
+              </table>
+            </form>
+            <table border="0" cellspacing="0" cellpadding="4">
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><a href="{{ url_for('console') }}">Return to console</a></font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

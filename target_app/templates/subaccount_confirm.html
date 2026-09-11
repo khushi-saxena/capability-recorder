@@ -1,0 +1,42 @@
+{% extends "content_base.html" %}
+{% block title %}Confirm Sub-Account{% endblock %}
+{% block heading %}Confirm Sub-Account{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#ffffff" bordercolor="#808080">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="10">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Verify the new share/draft before posting to CIF {{ member_id }} ({{ member.name }}).</font></td>
+        </tr>
+        <tr>
+          <td>
+            <table border="1" cellspacing="0" cellpadding="4" bgcolor="#ffffff" bordercolor="#808080">
+              <tr bgcolor="#cccccc">
+                <th align="left"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Product</font></th>
+                <th align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Current Balance</font></th>
+              </tr>
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">{{ product }}</font></td>
+                <td align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">{{ money(amount) }}</font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <form method="post" action="{{ url_for('subaccount_confirm', member_id=member_id) }}">
+              <table border="0" cellspacing="0" cellpadding="4">
+                <tr>
+                  <td><input type="submit" value="Post"></td>
+                  <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><a href="{{ url_for('subaccount_new', member_id=member_id) }}" target="content">Back</a></font></td>
+                </tr>
+              </table>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

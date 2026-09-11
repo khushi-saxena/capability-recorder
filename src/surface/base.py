@@ -19,7 +19,7 @@ import re
 from dataclasses import dataclass
 from typing import Iterable, Protocol, runtime_checkable
 
-from schema import (
+from src.schema import (
     AccessibleCandidate,
     AnchorCandidate,
     Candidate,

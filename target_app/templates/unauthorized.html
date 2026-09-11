@@ -1,0 +1,22 @@
+{% extends "content_base.html" %}
+{% block title %}Access Denied{% endblock %}
+{% block heading %}Member Record{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="12" bgcolor="#ffcccc" bordercolor="#cc0000">
+  <tr>
+    <td>
+      <font face="Tahoma, Arial, Helvetica, sans-serif" size="2" color="#cc0000">
+        <b>You are not authorized to view this member</b>
+      </font>
+      <table border="0" cellspacing="0" cellpadding="6">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">CIF {{ member_id }} is flagged restricted. Refer to Branch Operations.</font></td>
+        </tr>
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><a href="{{ url_for('member_search') }}" target="content">New Search</a></font></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

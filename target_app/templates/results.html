@@ -1,0 +1,47 @@
+{% extends "content_base.html" %}
+{% block title %}Search Results{% endblock %}
+{% block heading %}Search Results{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#ffffff" bordercolor="#808080">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="8">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Inquiry:&nbsp;<b>{{ q }}</b></font></td>
+        </tr>
+        {% if error %}
+        <tr>
+          <td>
+            <table width="100%" border="1" cellspacing="0" cellpadding="8" bgcolor="#ffff99" bordercolor="#cc0000">
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2" color="#cc0000"><b>{{ error }}</b></font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td>
+            <table width="100%" border="1" cellspacing="0" cellpadding="4" bgcolor="#ffffff" bordercolor="#808080">
+              <tr bgcolor="#cccccc">
+                <th align="left"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Member ID</font></th>
+                <th align="left"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Name</font></th>
+              </tr>
+              {% for row in results %}
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><a href="{{ url_for('member_detail', member_id=row.id) }}" target="content">{{ row.id }}</a></font></td>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">{{ row.name }}</font></td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><a href="{{ url_for('member_search') }}" target="content">New Search</a></font></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

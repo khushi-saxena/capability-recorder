@@ -1,0 +1,52 @@
+{% extends "content_base.html" %}
+{% block title %}Member {{ member_id }}{% endblock %}
+{% block heading %}Account Summary{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#ffffff" bordercolor="#808080">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="8">
+        <tr>
+          <td>
+            <table border="0" cellspacing="2" cellpadding="2">
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Member ID</font></td>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><b>{{ member_id }}</b></font></td>
+              </tr>
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Name</font></td>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2"><b>{{ member.name }}</b></font></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <table width="100%" border="1" cellspacing="0" cellpadding="4" bgcolor="#ffffff" bordercolor="#808080">
+              <tr bgcolor="#cccccc">
+                <th align="left"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Product</font></th>
+                <th align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Current Balance</font></th>
+              </tr>
+              {% for acct in member.accounts %}
+              <tr>
+                <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">{{ acct.product }}</font></td>
+                <td align="right"><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">{{ money(acct.balance) }}</font></td>
+              </tr>
+              {% endfor %}
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <font face="Tahoma, Arial, Helvetica, sans-serif" size="2">
+              <a href="{{ url_for('subaccount_new', member_id=member_id) }}" target="content">Open Sub-Account</a>
+              &nbsp;|&nbsp;
+              <a href="{{ url_for('member_search') }}" target="content">New Search</a>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}
