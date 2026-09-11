@@ -1,0 +1,25 @@
+allowed_origins:
+  - "http://127.0.0.1:8800"
+allowed_paths:
+  - "^/console$"
+  - "^/servicing/.*"
+  - "^/chrome/.*"
+allowed_intents:
+  - navigate
+  - fill
+  - select
+  - activate
+  - read
+risk_rules:
+  - intent: activate
+    url_pattern: "^/subaccount/confirm$"
+    risk: irreversible
+sensitive_name_patterns:
+  - "\\bssn\\b"
+  - "social\\s+security"
+  - "tax\\s+id"
+  - "card\\s+number"
+  - "\\brouting\\b"
+  - "date\\s+of\\s+birth"
+  - "\\bpassword\\b"
+  - "\\bpin\\b"
