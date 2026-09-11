@@ -1,0 +1,6 @@
+{"step_id":"open_search","intent":"navigate","resolved_strategy":"url","resolved_tier":null,"duration_ms":387,"recoveries":[],"checkpoint_ok":true,"note":"Entry point for member servicing."}
+{"step_id":"enter_member_id","intent":"fill","resolved_strategy":"label","resolved_tier":0,"duration_ms":31,"recoveries":[],"checkpoint_ok":null,"note":"Input has name=fld_003 and no accessible name; label sits to its left."}
+{"step_id":"submit_search","intent":"activate","resolved_strategy":"accessible","resolved_tier":0,"duration_ms":376,"recoveries":[],"checkpoint_ok":true,"note":null}
+{"step_id":"open_member","intent":"activate","resolved_strategy":"table_cell","resolved_tier":0,"duration_ms":384,"recoveries":[],"checkpoint_ok":true,"note":"Result grid is a nested table; row is keyed by the member id cell."}
+{"step_id":"read_name","intent":"read","resolved_strategy":"anchor","resolved_tier":0,"duration_ms":33,"recoveries":[],"checkpoint_ok":null,"note":null}
+{"step_id":"read_savings","intent":"read","resolved_strategy":"table_cell","resolved_tier":0,"duration_ms":21,"recoveries":[],"checkpoint_ok":null,"note":"Savings row of the account summary table."}

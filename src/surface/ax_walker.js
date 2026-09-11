@@ -32,12 +32,28 @@
     return ROLE_BY_TAG[el.tagName] || null;
   }
 
+  // Text belonging to this element, not to the layout hanging off it. A cell
+  // that wraps a nested table still keeps its own prose — these pages put the
+  // error banner in a <td> that also holds the next table down.
+  function shallowText(el) {
+    let out = "";
+    for (const n of el.childNodes) {
+      if (n.nodeType === 3) {
+        out += n.nodeValue;
+      } else if (n.nodeType === 1 && !n.matches("table, input, select, textarea") &&
+                 !n.querySelector("table, input, select, textarea")) {
+        out += " " + (n.textContent || "");
+      }
+    }
+    return out.replace(/\s+/g, " ").trim();
+  }
+
   // Own text only — a <td> wrapping a <font> counts, a <table> wrapping
   // fifty rows does not.
   function ownText(el) {
     if (el.tagName === "TD" || el.tagName === "TH" || el.tagName === "A" ||
         el.tagName === "BUTTON" || /^H[1-6]$/.test(el.tagName)) {
-      if (el.querySelector("table, input, select, textarea")) return "";
+      if (el.querySelector("table, input, select, textarea")) return shallowText(el);
       return (el.textContent || "").replace(/\s+/g, " ").trim();
     }
     let out = "";

@@ -2,3 +2,5 @@
 .venv/
 __pycache__/
 *.pyc
+evidence/adhoc/
+scratch.py

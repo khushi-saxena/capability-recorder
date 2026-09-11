@@ -137,6 +137,13 @@
         "candidates": [
           {
             "strategy": "anchor",
+            "anchor_text": "Name",
+            "direction": "right",
+            "role": "cell",
+            "frame_path": "main/content"
+          },
+          {
+            "strategy": "anchor",
             "anchor_text": "Member Name",
             "direction": "right",
             "role": "cell",

@@ -25,6 +25,8 @@ _WALKER = (Path(__file__).parent / "ax_walker.js").read_text()
 
 EVIDENCE_DIR = Path("evidence")
 
+_INTERACTIVE_TAGS = {"A", "BUTTON", "INPUT", "SELECT", "TEXTAREA", "LABEL"}
+
 
 class PlaywrightSurface:
     def __init__(self, headless: bool = False, viewport=(1280, 900)):
@@ -154,7 +156,14 @@ class PlaywrightSurface:
         time.sleep(0.3)
 
     def activate(self, handle: int) -> None:
-        self._locator(handle).click()
+        loc = self._locator(handle)
+        if loc.evaluate("el => el.tagName") not in _INTERACTIVE_TAGS:
+            # table_cell resolution lands on the <td>, which in these layouts is
+            # mostly padding. The operator clicked the one control inside it.
+            inner = loc.locator("a, button, input[type=submit], input[type=button]")
+            if inner.count() == 1:
+                loc = inner.first
+        loc.click()
         time.sleep(0.3)
 
     def fill(self, handle: int, text: str) -> None:
