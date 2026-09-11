@@ -6,7 +6,7 @@
   "app": {
     "vendor": "MeridianCU",
     "product": "Servicing Console",
-    "origin": "http://localhost:8800",
+    "origin": "http://127.0.0.1:8800",
     "version_hint": "4.2",
     "title_pattern": "Servicing Console",
     "ax_shape_hash": "b7f1c0a9"
@@ -40,13 +40,11 @@
       "id": "open_search",
       "intent": "navigate",
       "note": "Entry point for member servicing.",
-      "url_template": "http://localhost:8800/servicing/member/search",
+      "url_template": "http://127.0.0.1:8800/console",
       "checkpoint": {
-        "kind": "ax_present",
-        "role": "heading",
-        "name": "Member Search",
-        "name_match": "contains",
-        "frame_path": "main"
+        "kind": "text_present",
+        "text": "Member Search",
+        "frame_path": "main/content"
       }
     },
     {
