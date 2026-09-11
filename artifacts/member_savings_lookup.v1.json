@@ -1,0 +1,279 @@
+{
+  "schema_version": "1.0",
+  "name": "member_savings_lookup",
+  "version": 1,
+  "describes": "Look up a member by ID and return their current savings balance.",
+  "app": {
+    "vendor": "MeridianCU",
+    "product": "Servicing Console",
+    "origin": "http://localhost:8800",
+    "version_hint": "4.2",
+    "title_pattern": "Servicing Console",
+    "ax_shape_hash": "b7f1c0a9"
+  },
+  "inputs": {
+    "member_id": {
+      "type": "string",
+      "describes": "Institution member number, 5 digits.",
+      "required": true,
+      "pattern": "^[0-9]{5}$",
+      "sensitive": false,
+      "example": "12345"
+    }
+  },
+  "outputs": {
+    "savings_balance": {
+      "type": "number",
+      "describes": "Current savings balance in USD.",
+      "redact": false
+    },
+    "member_name": {
+      "type": "string",
+      "describes": "Member display name as shown on the detail screen.",
+      "redact": true
+    }
+  },
+  "risk_class": "safe",
+  "approval_state": "approved",
+  "flow": [
+    {
+      "id": "open_search",
+      "intent": "navigate",
+      "note": "Entry point for member servicing.",
+      "url_template": "http://localhost:8800/servicing/member/search",
+      "checkpoint": {
+        "kind": "ax_present",
+        "role": "heading",
+        "name": "Member Search",
+        "name_match": "contains",
+        "frame_path": "main"
+      }
+    },
+    {
+      "id": "enter_member_id",
+      "intent": "fill",
+      "note": "Input has name=fld_003 and no accessible name; label sits to its left.",
+      "target": {
+        "describes": "Member ID search box",
+        "candidates": [
+          {
+            "strategy": "label",
+            "label_text": "Member ID",
+            "control_role": "textbox",
+            "label_match": "contains",
+            "frame_path": "main/content"
+          },
+          {
+            "strategy": "anchor",
+            "anchor_text": "Member ID",
+            "direction": "right",
+            "role": "textbox",
+            "frame_path": "main/content"
+          }
+        ]
+      },
+      "value_template": "{{member_id}}",
+      "sensitive": false
+    },
+    {
+      "id": "submit_search",
+      "intent": "activate",
+      "target": {
+        "describes": "Search button",
+        "candidates": [
+          {
+            "strategy": "accessible",
+            "role": "button",
+            "name": "Search",
+            "name_match": "exact",
+            "frame_path": "main/content"
+          },
+          {
+            "strategy": "anchor",
+            "anchor_text": "Member ID",
+            "direction": "below",
+            "role": "button",
+            "frame_path": "main/content"
+          }
+        ]
+      },
+      "checkpoint": {
+        "kind": "text_present",
+        "text": "Search Results",
+        "frame_path": "main/content"
+      }
+    },
+    {
+      "id": "open_member",
+      "intent": "activate",
+      "note": "Result grid is a nested table; row is keyed by the member id cell.",
+      "target": {
+        "describes": "Member row link in the results grid",
+        "candidates": [
+          {
+            "strategy": "table_cell",
+            "row_contains": "{{member_id}}",
+            "column_header": "Member",
+            "frame_path": "main/content"
+          },
+          {
+            "strategy": "accessible",
+            "role": "link",
+            "name": "{{member_id}}",
+            "name_match": "contains",
+            "frame_path": "main/content"
+          }
+        ]
+      },
+      "checkpoint": {
+        "kind": "text_present",
+        "text": "Account Summary",
+        "frame_path": "main/content"
+      }
+    },
+    {
+      "id": "read_name",
+      "intent": "read",
+      "target": {
+        "describes": "Member name on the detail header",
+        "candidates": [
+          {
+            "strategy": "anchor",
+            "anchor_text": "Member Name",
+            "direction": "right",
+            "role": "cell",
+            "frame_path": "main/content"
+          }
+        ]
+      },
+      "output_key": "member_name",
+      "parse": "text"
+    },
+    {
+      "id": "read_savings",
+      "intent": "read",
+      "note": "Savings row of the account summary table.",
+      "target": {
+        "describes": "Current balance cell on the SAVINGS row",
+        "candidates": [
+          {
+            "strategy": "table_cell",
+            "row_contains": "SAVINGS",
+            "column_header": "Current Balance",
+            "frame_path": "main/content"
+          },
+          {
+            "strategy": "anchor",
+            "anchor_text": "SAVINGS",
+            "direction": "right",
+            "role": "cell",
+            "frame_path": "main/content"
+          }
+        ]
+      },
+      "output_key": "savings_balance",
+      "parse": "currency"
+    }
+  ],
+  "success": {
+    "kind": "all_of",
+    "of": [
+      {
+        "kind": "text_present",
+        "text": "Account Summary",
+        "frame_path": "main/content"
+      },
+      {
+        "kind": "text_present",
+        "text": "SAVINGS",
+        "frame_path": "main/content"
+      }
+    ]
+  },
+  "expected_outcomes": [
+    {
+      "code": "MEMBER_NOT_FOUND",
+      "describes": "Search returned no matching member. Legitimate answer, not a failure.",
+      "detect": {
+        "kind": "text_present",
+        "text": "No records match",
+        "frame_path": "main/content"
+      },
+      "after_step": "submit_search"
+    },
+    {
+      "code": "INVALID_MEMBER_ID",
+      "describes": "App rejected the ID format before searching.",
+      "detect": {
+        "kind": "text_present",
+        "text": "Member ID must be numeric",
+        "frame_path": "main/content"
+      },
+      "after_step": "submit_search"
+    },
+    {
+      "code": "ACCESS_DENIED",
+      "describes": "Operator role cannot view this member's accounts.",
+      "detect": {
+        "kind": "text_present",
+        "text": "not authorized to view",
+        "frame_path": "main/content"
+      },
+      "after_step": "open_member"
+    },
+    {
+      "code": "NO_SAVINGS_ACCOUNT",
+      "describes": "Member exists but holds no savings product.",
+      "detect": {
+        "kind": "text_present",
+        "text": "SAVINGS",
+        "frame_path": "main/content",
+        "negate": true
+      },
+      "after_step": "open_member"
+    }
+  ],
+  "recoverable": [
+    {
+      "name": "compliance_interstitial",
+      "detect": {
+        "kind": "ax_present",
+        "role": "button",
+        "name": "Acknowledge",
+        "name_match": "exact",
+        "frame_path": "main"
+      },
+      "action": "dismiss",
+      "dismiss_target": {
+        "describes": "Acknowledge button on the daily compliance notice",
+        "candidates": [
+          {
+            "strategy": "accessible",
+            "role": "button",
+            "name": "Acknowledge",
+            "name_match": "exact",
+            "frame_path": "main"
+          }
+        ]
+      },
+      "max_attempts": 1
+    },
+    {
+      "name": "transient_frame_load",
+      "detect": {
+        "kind": "text_present",
+        "text": "Loading, please wait",
+        "frame_path": "main/content"
+      },
+      "action": "retry_step",
+      "max_attempts": 3
+    }
+  ],
+  "provenance": {
+    "discovery_run_id": "disc_20260909_a41f",
+    "model": "claude-sonnet-4-6",
+    "recorded_at": "2026-09-09T14:22:11Z",
+    "recorded_by": "discovery-agent",
+    "redaction_applied": true
+  }
+}

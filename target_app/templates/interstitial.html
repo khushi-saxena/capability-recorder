@@ -1,0 +1,58 @@
+{% extends "content_base.html" %}
+{% block title %}Notice{% endblock %}
+{% block heading %}Compliance Gate{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="0" bgcolor="#ffffff" bordercolor="#003366">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="10">
+        <tr>
+          <td>
+            {% if variant == "unknown" %}
+            <font face="Tahoma, Arial, Helvetica, sans-serif" size="3"><b>Overnight Batch Advisory</b></font>
+            <table border="0" cellspacing="0" cellpadding="6">
+              <tr>
+                <td>
+                  <font face="Tahoma, Arial, Helvetica, sans-serif" size="2">
+                    The servicing host will begin end-of-day posting in this window.
+                    Uncommitted teller work may be discarded. Proceed only if you have
+                    finished item processing for this member.
+                  </font>
+                </td>
+              </tr>
+            </table>
+            {% else %}
+            <font face="Tahoma, Arial, Helvetica, sans-serif" size="3"><b>Bank Secrecy Act / CIP Notice</b></font>
+            <table border="0" cellspacing="0" cellpadding="6">
+              <tr>
+                <td>
+                  <font face="Tahoma, Arial, Helvetica, sans-serif" size="2">
+                    Federal regulation requires that you acknowledge customer identification
+                    procedures before viewing or changing member records. Access is logged.
+                  </font>
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+            <form method="post" action="{{ url_for('interstitial_ack') }}">
+              <input type="hidden" name="fld_001" value="{{ next_url }}">
+              <input type="hidden" name="fld_002" value="{{ variant }}">
+              <table border="0" cellspacing="0" cellpadding="4">
+                <tr>
+                  <td>
+                    {% if variant == "unknown" %}
+                    <input type="submit" value="Continue">
+                    {% else %}
+                    <input type="submit" value="Acknowledge">
+                    {% endif %}
+                  </td>
+                </tr>
+              </table>
+            </form>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

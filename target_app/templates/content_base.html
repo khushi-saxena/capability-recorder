@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>{% block title %}PHCU Servicing{% endblock %}</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  {% block head %}{% endblock %}
+</head>
+<body bgcolor="#d4d0c8" text="#000000" link="#0000cc" vlink="#000099" alink="#ff0000" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="#d4d0c8">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="6" bgcolor="#003366">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2" color="#ffffff"><b>{% block heading %}{% endblock %}</b></font></td>
+        </tr>
+      </table>
+      <table width="100%" border="0" cellspacing="8" cellpadding="0">
+        <tr>
+          <td>
+            {% block body %}{% endblock %}
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

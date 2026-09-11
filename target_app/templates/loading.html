@@ -1,0 +1,20 @@
+{% extends "content_base.html" %}
+{% block title %}Please wait{% endblock %}
+{% block head %}
+  <meta http-equiv="refresh" content="3;url={{ next_url }}">
+{% endblock %}
+{% block heading %}PHCU Servicing{% endblock %}
+{% block body %}
+<table width="100%" border="1" cellspacing="0" cellpadding="16" bgcolor="#ffffcc" bordercolor="#999966">
+  <tr>
+    <td align="center">
+      <font face="Tahoma, Arial, Helvetica, sans-serif" size="3"><b>Loading, please wait</b></font>
+      <table border="0" cellspacing="0" cellpadding="4">
+        <tr>
+          <td><font face="Tahoma, Arial, Helvetica, sans-serif" size="2">Retrieving record from host INTRASERV-04&hellip;</font></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+{% endblock %}

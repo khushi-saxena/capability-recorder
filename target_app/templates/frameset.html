@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+<html>
+<head>
+  <title>PHCU Member Servicing Console</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<frameset rows="64,*" border="1" frameborder="1" framespacing="1">
+  <frame src="{{ url_for('chrome_banner') }}" name="banner" scrolling="no" noresize>
+  <frameset cols="190,*" border="1" frameborder="1" framespacing="1">
+    <frame src="{{ url_for('chrome_nav') }}" name="nav" scrolling="auto">
+    <frame src="{{ content_src }}" name="content" scrolling="auto">
+  </frameset>
+</frameset>
+<noframes>
+  <body bgcolor="#cccccc">
+    <p>This console requires a frames-capable browser. Open <a href="{{ content_src }}">member search</a>.</p>
+  </body>
+</noframes>
+</html>
