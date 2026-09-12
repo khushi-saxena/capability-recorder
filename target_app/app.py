@@ -207,7 +207,9 @@ def login():
 @app.route("/console")
 @require_session
 def console():
-    content_src = url_for("member_search")
+    # Forward the incoming query to the content frame: the runtime gates read
+    # their flags off the content request, not off the frameset.
+    content_src = _with_query(url_for("member_search"), **request.args.to_dict())
     return render_template("frameset.html", content_src=content_src)
 
 

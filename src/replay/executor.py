@@ -24,6 +24,7 @@ import re
 import time
 import uuid
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from pathlib import Path
 from typing import Any, Iterable, Protocol
 
@@ -77,7 +78,7 @@ class EscalationRequest:
     """Handed to a human (or, later, an operator agent) when replay is stuck.
     Carries enough to act on without reading the artifact."""
 
-    kind: str  # target_unresolved | guardrail_confirmation | checkpoint_mismatch
+    kind: str  # target_unresolved | checkpoint_mismatch | risky_action_confirmation
     run_id: str
     capability: str
     reason: str
@@ -139,6 +140,17 @@ class _Abort(Exception):
         self.capture = capture  # False when the browser was never touched
 
 
+class _StepDoneByHuman(Exception):
+    """The operator finished this step themselves, verified by its checkpoint.
+    Whatever the automation was about to do is now stale."""
+
+
+class _Resume(Enum):
+    NO_ESCALATOR = auto()  # nobody was asked; the caller keeps its own failure
+    RETRY = auto()  # operator resolved it and there is nothing to verify
+    # (a step that was verified raises _StepDoneByHuman instead)
+
+
 @dataclass
 class _StepState:
     started: float
@@ -146,6 +158,7 @@ class _StepState:
     strategy: str | None = None
     tier: int | None = None
     checkpoint_ok: bool | None = None
+    human_completed: bool = False
     note: str | None = None
 
 
@@ -187,6 +200,8 @@ class _Replay:
             state = _StepState(started=time.monotonic())
             try:
                 outcome = self._run_step(step, index, state)
+            except _StepDoneByHuman:
+                outcome = None  # verified against the step's own checkpoint
             except _Abort:
                 self._log(step, state)
                 raise
@@ -208,12 +223,14 @@ class _Replay:
 
         if isinstance(step, NavigateStep):
             url = _bind_text(step.url_template, self.params)
-            self._check(self.policy.check_navigate(url), step, index, f"navigate {url}")
+            self._check(
+                self.policy.check_navigate(url), step, index, state, f"navigate {url}"
+            )
             self._act(step, index, "navigate", lambda: self.surface.navigate(url))
             state.strategy = "url"
         else:
             target = bind_templates(step.target, self.params)
-            resolution, coordinate, obs = self._resolve(step, index, target, obs)
+            resolution, coordinate, obs = self._resolve(step, index, state, target, obs)
             state.strategy = resolution.strategy if resolution else "coordinate"
             state.tier = resolution.tier if resolution else _coordinate_tier(target)
 
@@ -221,6 +238,7 @@ class _Replay:
                 self.policy.check_action(step.intent, obs.url, step.risk.value),
                 step,
                 index,
+                state,
                 f"{step.intent} on {step.target.describes}",
             )
             self._perform(step, index, resolution, coordinate)
@@ -239,16 +257,19 @@ class _Replay:
                     state.note = f"checkpoint superseded by business outcome {outcome.code}"
                     return outcome
 
-            if not state.checkpoint_ok and self._escalate(
-                "checkpoint_mismatch",
-                step,
-                index,
-                f"checkpoint for step {step.id} did not hold within {step.timeout_ms}ms",
-                describe(step.checkpoint),
-                self._slice(obs, step.checkpoint),
-            ):
-                state.checkpoint_ok, obs = self._poll_checkpoint(step, index)
             if not state.checkpoint_ok:
+                # With a checkpoint to verify against, this either completes the
+                # step by hand, fails as escalation_unresolved, or - with no
+                # escalator wired - returns and leaves the mismatch standing.
+                self._escalate_and_verify(
+                    "checkpoint_mismatch",
+                    step,
+                    index,
+                    state,
+                    f"checkpoint for step {step.id} did not hold within {step.timeout_ms}ms",
+                    describe(step.checkpoint),
+                    self._slice(obs, step.checkpoint),
+                )
                 raise _Abort(
                     FailureClass.CHECKPOINT_MISMATCH,
                     describe(step.checkpoint),
@@ -333,6 +354,7 @@ class _Replay:
             obs = self._observe(step, index)
 
     def _apply_recovery(self, condition: RecoverableCondition, obs: Observation) -> str:
+        self._require_lease()
         if condition.action is RecoveryAction.DISMISS:
             target = bind_templates(condition.dismiss_target, self.params)
             try:
@@ -385,19 +407,26 @@ class _Replay:
     # -- resolution, policy, action ----------------------------------------
 
     def _resolve(
-        self, step: Step, index: int, target: Target, obs: Observation
+        self,
+        step: Step,
+        index: int,
+        state: _StepState,
+        target: Target,
+        obs: Observation,
     ) -> tuple[Resolution | None, CoordinateCandidate | None, Observation]:
         try:
             return resolve(target, obs), None, obs
         except TargetUnresolved as unresolved:
-            if self._escalate(
+            resume = self._escalate_and_verify(
                 "target_unresolved",
                 step,
                 index,
+                state,
                 f"could not find {target.describes!r}",
                 target.describes,
                 f"tried {unresolved.tried}",
-            ):
+            )
+            if resume is _Resume.RETRY:
                 obs = self._observe(step, index)
                 try:
                     return resolve(target, obs), None, obs
@@ -418,7 +447,9 @@ class _Replay:
                 index,
             ) from unresolved
 
-    def _check(self, decision, step: Step, index: int, what: str) -> None:
+    def _check(
+        self, decision, step: Step, index: int, state: _StepState, what: str
+    ) -> None:
         if isinstance(decision, Allow):
             return
         if isinstance(decision, Deny):
@@ -430,14 +461,16 @@ class _Replay:
                 index,
             )
         if isinstance(decision, RequireConfirmation):
-            if self._escalate(
-                "guardrail_confirmation",
+            resume = self._escalate_and_verify(
+                "risky_action_confirmation",
                 step,
                 index,
+                state,
                 decision.reason,
                 f"confirmation for {what}",
                 decision.reason,
-            ):
+            )
+            if resume is _Resume.RETRY:
                 return
             raise _Abort(
                 FailureClass.GUARDRAIL_BLOCK,
@@ -479,7 +512,16 @@ class _Replay:
         else:
             raise TypeError(f"unknown step: {step!r}")
 
+    def _require_lease(self) -> None:
+        """A session controller refuses automation actions while the operator
+        holds the lease. Raised, never caught: a click landing in a human's
+        session is a bug, not an operational outcome."""
+        require = getattr(self.escalator, "require", None)
+        if require is not None:
+            require("automation")
+
     def _act(self, step: Step, index: int, verb: str, action) -> Any:
+        self._require_lease()
         try:
             return action()
         except Exception as exc:
@@ -507,6 +549,57 @@ class _Replay:
             time.sleep(CHECKPOINT_POLL_S)
 
     # -- escalation --------------------------------------------------------
+
+    def _escalate_and_verify(
+        self,
+        kind: str,
+        step: Step | None,
+        index: int | None,
+        state: _StepState,
+        reason: str,
+        expected: str,
+        observed: str,
+    ) -> _Resume:
+        """Hand the session to a human, then check what they left behind.
+
+        The operator drives the real browser, so control can come back with the
+        session anywhere - two screens on, half a form filled, or exactly where
+        the automation wanted it. The step's checkpoint is the only declaration
+        we have of where it should be, so that, not the operator's own verdict,
+        decides whether the run continues."""
+        if self.escalator is None:
+            return _Resume.NO_ESCALATOR
+
+        if not self._escalate(kind, step, index, reason, expected, observed):
+            raise _Abort(
+                FailureClass.ESCALATION_UNRESOLVED,
+                expected,
+                f"operator returned control unresolved: {observed}",
+                step.id if step else None,
+                index,
+            )
+
+        if step is None or step.checkpoint is None:
+            # Nothing declared to verify against; retry the step as written.
+            return _Resume.RETRY
+
+        obs = self._observe(step, index)
+        if evaluate(step.checkpoint, obs, self.surface):
+            state.checkpoint_ok = True
+            state.human_completed = True
+            state.note = f"completed by operator after {kind}"
+            raise _StepDoneByHuman()
+
+        # Marked resolved, but the session is not where the step says it should
+        # be. Trusting the verdict here is how a half-finished handoff becomes a
+        # wrong answer three steps later.
+        raise _Abort(
+            FailureClass.ESCALATION_UNRESOLVED,
+            describe(step.checkpoint),
+            self._slice(obs, step.checkpoint),
+            step.id,
+            index,
+        )
 
     def _escalate(
         self,
@@ -565,6 +658,7 @@ class _Replay:
                 duration_ms=int((time.monotonic() - state.started) * 1000),
                 recoveries=state.recoveries,
                 checkpoint_ok=state.checkpoint_ok,
+                human_completed=state.human_completed,
                 note=state.note or step.note,
             )
         )

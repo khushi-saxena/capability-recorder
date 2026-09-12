@@ -47,6 +47,8 @@ class StepLog(BaseModel):
     duration_ms: int = 0
     recoveries: list[str] = Field(default_factory=list)
     checkpoint_ok: bool | None = None
+    # True when an operator took the session and finished the step by hand.
+    human_completed: bool = False
     note: str | None = None
 
 

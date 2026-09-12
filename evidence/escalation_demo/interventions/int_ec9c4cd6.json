@@ -1,0 +1,20 @@
+{
+  "request": {
+    "id": "int_ec9c4cd6",
+    "run_id": "escalation_demo",
+    "capability_ref": "member_savings_lookup@1",
+    "step_id": "open_search",
+    "step_index": 0,
+    "reason": "checkpoint_mismatch",
+    "expected": "text 'Member Search' in main/content",
+    "observed": "Compliance Gate Overnight Batch Advisory The servicing host will begin end-of-day posting in this window. Uncommitted teller work may be discarded. Proceed only Continue",
+    "screenshot_path": "evidence/escalation_demo/shot_c378713e.png",
+    "ax_snapshot_path": "evidence/escalation_demo/interventions/ax_00.json",
+    "created_at": "2026-09-12T07:03:53+00:00"
+  },
+  "outcome": {
+    "resolved": true,
+    "operator_notes": "read the batch advisory, left it up",
+    "ended_at": "2026-09-12T07:03:53+00:00"
+  }
+}

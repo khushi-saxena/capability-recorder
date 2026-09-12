@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable, Protocol, runtime_checkable
+from typing import Callable, Iterable, Protocol, runtime_checkable
 
 from src.schema import (
     AccessibleCandidate,
@@ -79,6 +79,32 @@ class Observation:
             if _in_frame(n.frame_path, frame_path)
         ]
         return "\n".join(p for p in parts if p)
+
+
+def ax_snapshot(obs: Observation, redact: Callable[[str], str] | None = None) -> dict:
+    """Serialisable form of an observation, for evidence. `redact` is applied to
+    every name and value, so a snapshot can be written from a screen holding
+    member data without copying it into the run folder."""
+    clean = redact or (lambda s: s)
+    return {
+        "url": obs.url,
+        "title": obs.title,
+        "nodes": [
+            {
+                "handle": n.handle,
+                "role": n.role,
+                "name": clean(n.name),
+                "value": clean(n.value) if n.value else n.value,
+                "enabled": n.enabled,
+                "frame_path": n.frame_path,
+                "box": None if n.box is None else [n.box.x, n.box.y, n.box.w, n.box.h],
+                "table_id": n.table_id,
+                "row": n.row,
+                "col": n.col,
+            }
+            for n in obs.nodes
+        ],
+    }
 
 
 @runtime_checkable

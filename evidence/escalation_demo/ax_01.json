@@ -1,0 +1,314 @@
+{
+  "run_id": "escalation_demo",
+  "capability": "member_savings_lookup@1",
+  "url": "http://127.0.0.1:8800/console?interstitial=unknown",
+  "title": "PHCU Member Servicing Console",
+  "nodes": [
+    {
+      "handle": 1,
+      "role": "cell",
+      "name": "Pioneer Heritage Credit Union Member Servicing Console v2.4",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/banner",
+      "box": [
+        0.0,
+        0.0,
+        0.65460205078125,
+        0.035555555555555556
+      ],
+      "table_id": "main/banner:t0",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 2,
+      "role": "cell",
+      "name": "Operator: op1 | Host: INTRASERV-04",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/banner",
+      "box": [
+        0.65460205078125,
+        0.0,
+        0.34539794921875,
+        0.035555555555555556
+      ],
+      "table_id": "main/banner:t0",
+      "row": 0,
+      "col": 1
+    },
+    {
+      "handle": 3,
+      "role": "cell",
+      "name": "",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.0,
+        0.07222222222222222,
+        0.1484375,
+        0.13777777777777778
+      ],
+      "table_id": "main/nav:t0",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 4,
+      "role": "cell",
+      "name": "Functions",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.0,
+        0.07222222222222222,
+        0.1484375,
+        0.03111111111111111
+      ],
+      "table_id": "main/nav:t1",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 5,
+      "role": "cell",
+      "name": "Member Search",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.0,
+        0.10333333333333333,
+        0.1484375,
+        0.035555555555555556
+      ],
+      "table_id": "main/nav:t2",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 6,
+      "role": "link",
+      "name": "Member Search",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.00625,
+        0.11222222222222222,
+        0.06981201171875,
+        0.017777777777777778
+      ],
+      "table_id": null,
+      "row": null,
+      "col": null
+    },
+    {
+      "handle": 7,
+      "role": "cell",
+      "name": "Demo Inject",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.0,
+        0.1388888888888889,
+        0.1484375,
+        0.035555555555555556
+      ],
+      "table_id": "main/nav:t2",
+      "row": 1,
+      "col": 0
+    },
+    {
+      "handle": 8,
+      "role": "link",
+      "name": "Demo Inject",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.00625,
+        0.14777777777777779,
+        0.0551513671875,
+        0.017777777777777778
+      ],
+      "table_id": null,
+      "row": null,
+      "col": null
+    },
+    {
+      "handle": 9,
+      "role": "cell",
+      "name": "Sign Off",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.0,
+        0.17444444444444446,
+        0.1484375,
+        0.035555555555555556
+      ],
+      "table_id": "main/nav:t2",
+      "row": 2,
+      "col": 0
+    },
+    {
+      "handle": 10,
+      "role": "link",
+      "name": "Sign Off",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/nav",
+      "box": [
+        0.00625,
+        0.18333333333333332,
+        0.03602294921875,
+        0.017777777777777778
+      ],
+      "table_id": null,
+      "row": null,
+      "col": null
+    },
+    {
+      "handle": 11,
+      "role": "cell",
+      "name": "",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.14921875,
+        0.07222222222222222,
+        0.85078125,
+        0.16
+      ],
+      "table_id": "main/content:t0",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 12,
+      "role": "cell",
+      "name": "Compliance Gate",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.14921875,
+        0.07222222222222222,
+        0.85078125,
+        0.03111111111111111
+      ],
+      "table_id": "main/content:t1",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 13,
+      "role": "cell",
+      "name": "",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.15546875,
+        0.11222222222222222,
+        0.83828125,
+        0.1111111111111111
+      ],
+      "table_id": "main/content:t2",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 14,
+      "role": "cell",
+      "name": "",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.15625,
+        0.11333333333333333,
+        0.83671875,
+        0.10888888888888888
+      ],
+      "table_id": "main/content:t3",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 15,
+      "role": "cell",
+      "name": "Overnight Batch Advisory",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.15703125,
+        0.11444444444444445,
+        0.83515625,
+        0.10666666666666667
+      ],
+      "table_id": "main/content:t4",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 16,
+      "role": "cell",
+      "name": "The servicing host will begin end-of-day posting in this window. Uncommitted teller work may be discarded. Proceed only ",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.16484375,
+        0.14666666666666667,
+        0.793359375,
+        0.03111111111111111
+      ],
+      "table_id": "main/content:t5",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 17,
+      "role": "cell",
+      "name": "",
+      "value": null,
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.16484375,
+        0.17777777777777778,
+        0.06043701171875,
+        0.03222222222222222
+      ],
+      "table_id": "main/content:t6",
+      "row": 0,
+      "col": 0
+    },
+    {
+      "handle": 18,
+      "role": "button",
+      "name": "Continue",
+      "value": "Continue",
+      "enabled": true,
+      "frame_path": "main/content",
+      "box": [
+        0.16796875,
+        0.18222222222222223,
+        0.05418701171875,
+        0.023333333333333334
+      ],
+      "table_id": null,
+      "row": null,
+      "col": null
+    }
+  ]
+}

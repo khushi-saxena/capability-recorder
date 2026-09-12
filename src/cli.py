@@ -16,9 +16,11 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from src.operator.console import PORT as CONSOLE_PORT
 from src.policy.policy import Policy
 from src.replay.executor import replay
 from src.schema import Capability
+from src.session.controller import SessionController
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -36,6 +38,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="skip the sign-in the target app needs before the flow can run",
     )
+    run.add_argument(
+        "--operator-console",
+        action="store_true",
+        help="hand stuck steps to a human through the console on --console-port",
+    )
+    run.add_argument("--console-port", type=int, default=CONSOLE_PORT)
 
     args, extra = parser.parse_known_args(argv)
     if args.command != "replay":
@@ -53,6 +61,17 @@ def main(argv: list[str] | None = None) -> int:
     from src.surface.playwright_surface import PlaywrightSurface
 
     surface = PlaywrightSurface(headless=args.headless)
+    controller = None
+    if args.operator_console:
+        from src.operator.console import serve
+
+        controller = SessionController(surface, policy=policy)
+        serve(controller, port=args.console_port)
+        print(
+            f"operator console on http://127.0.0.1:{args.console_port}",
+            file=sys.stderr,
+        )
+
     try:
         if not args.no_login:
             _sign_in(surface, capability.app.origin, args.operator)
@@ -61,7 +80,7 @@ def main(argv: list[str] | None = None) -> int:
             params,
             surface,
             policy,
-            escalator=None,  # Phase 5 supplies the real one
+            escalator=controller,
             run_id=args.run_id,
         )
     finally:
